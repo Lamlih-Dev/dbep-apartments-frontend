@@ -5,7 +5,7 @@ import { QRCodeCanvas } from "qrcode.react";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 const DETAILS_BASE_URL =
-  import.meta.env.VITE_PUBLIC_DETAILS_BASE_URL ??
+  import.meta.env.VITE_API_BASE_URL ??
   "http://localhost:5173/apartments/";
 
 type Apartment = {
