@@ -9,9 +9,7 @@ type Apartment = {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
-const DETAILS_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ??
-  "http://localhost:5173/apartments/";
+const DETAILS_BASE_URL = import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/apartments` : "http://localhost:5173/apartments/";
 
 export default function ApartmentsListPage() {
   const [apartments, setApartments] = useState<Apartment[]>([]);
