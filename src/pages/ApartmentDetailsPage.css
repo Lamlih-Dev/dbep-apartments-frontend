@@ -1,13 +1,8 @@
-/* ApartmentDetailsPage.css */
-
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+/* Premium Light Apartment Details (scoped) */
 
 .aptD {
-  /* IMPORTANT FIX: remove internal page padding to avoid double-gutters */
-  padding: 0;
-
+  padding: 24px;
   color: #111827;
-  font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* Top bar */
@@ -51,7 +46,7 @@
   flex-wrap: wrap;
 }
 
-/* Buttons (scoped) */
+/* Buttons (scoped so global .btn doesn’t interfere) */
 .aptD-btn {
   border: 1px solid transparent;
   border-radius: 999px;
@@ -99,7 +94,7 @@
 /* Hero */
 .aptD-hero {
   display: grid;
-  grid-template-columns: 1.6fr 1fr; /* a touch more like your reference */
+  grid-template-columns: 1.55fr 1fr;
   gap: 14px;
   margin-top: 10px;
 }
@@ -116,13 +111,13 @@
   background: #ffffff;
   box-shadow: 0 18px 50px rgba(17, 24, 39, 0.10);
   border: 1px solid rgba(17, 24, 39, 0.06);
-  min-height: 360px;
+  height: 360px;
 }
 
 .aptD-heroImg {
   width: 100%;
   height: 100%;
-  min-height: 360px;
+  height: 360px;
   display: block;
   object-fit: cover;
 }
@@ -130,7 +125,7 @@
 .aptD-heroPlaceholder {
   width: 100%;
   height: 100%;
-  min-height: 360px;
+  height: 360px;
   display: grid;
   place-items: center;
   background:
@@ -290,10 +285,6 @@ details[open] .aptD-detailsSummary:after {
   justify-content: space-between;
   gap: 12px;
   font-size: 13px;
-  margin-top: 8px;
-}
-.aptD-row:first-child {
-  margin-top: 0;
 }
 .aptD-rowKey {
   color: #6b7280;
@@ -309,7 +300,7 @@ details[open] .aptD-detailsSummary:after {
 .aptD-grid {
   margin-top: 14px;
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.55fr 1fr;
   gap: 14px;
   align-items: start;
 }
@@ -318,11 +309,6 @@ details[open] .aptD-detailsSummary:after {
   .aptD-grid {
     grid-template-columns: 1fr;
   }
-}
-
-.aptD-leftCol {
-  display: grid;
-  gap: 14px;
 }
 
 .aptD-card {
@@ -337,13 +323,6 @@ details[open] .aptD-detailsSummary:after {
   padding: 16px 18px;
   border-bottom: 1px solid #f3f4f6;
   background: #ffffff;
-}
-
-.aptD-cardHeaderRow {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
 }
 
 .aptD-cardKicker {
@@ -371,7 +350,7 @@ details[open] .aptD-detailsSummary:after {
   font-size: 14px;
 }
 
-/* Sticky QR card */
+/* Sticky QR card on desktop */
 .aptD-cardSticky {
   position: sticky;
   top: 18px;
@@ -403,128 +382,4 @@ details[open] .aptD-detailsSummary:after {
   margin-top: 12px;
   font-size: 12px;
   color: #6b7280;
-}
-
-/* Reviews */
-.aptD-ratingPill {
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  padding: 8px 10px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-
-.aptD-stars {
-  display: inline-flex;
-  gap: 2px;
-  line-height: 1;
-}
-.aptD-star {
-  font-size: 14px;
-  color: #d1d5db;
-}
-.aptD-starOn {
-  color: #111827;
-}
-
-.aptD-ratingText {
-  font-weight: 750;
-  color: #111827;
-  font-size: 13px;
-}
-.aptD-ratingCount {
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.aptD-reviews {
-  display: grid;
-  gap: 14px;
-}
-
-.aptD-review {
-  display: grid;
-  grid-template-columns: 42px 1fr;
-  gap: 12px;
-  padding: 14px;
-  border-radius: 18px;
-  border: 1px solid #eef2f7;
-  background: #ffffff;
-}
-
-.aptD-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 12px;
-  color: #111827;
-  background:
-    radial-gradient(90px 60px at 10% 10%, rgba(17, 24, 39, 0.10), transparent 60%),
-    #f3f4f6;
-  border: 1px solid rgba(17, 24, 39, 0.06);
-}
-
-.aptD-reviewTop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.aptD-reviewName {
-  font-weight: 800;
-  letter-spacing: -0.01em;
-}
-
-.aptD-reviewMeta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-
-.aptD-dotSm {
-  color: #cbd5e1;
-}
-
-.aptD-reviewStars {
-  margin-top: 6px;
-}
-
-.aptD-reviewText {
-  margin-top: 8px;
-  color: #374151;
-  font-size: 13px;
-  line-height: 1.65;
-}
-
-/* Map */
-.aptD-mapWrap {
-  border-radius: 18px;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-
-.aptD-mapWrap iframe {
-  width: 100%;
-  height: 320px;
-  border: 0;
-  display: block;
-}
-
-.aptD-mapFooter {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
 }

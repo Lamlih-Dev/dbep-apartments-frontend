@@ -1,28 +1,37 @@
 import { Routes, Route, Navigate, Link } from "react-router-dom";
 
-import ApartmentsListPage from "./pages/ApartmentsListPage.tsx";
-import ApartmentCreatePage from "./pages/ApartmentCreatePage.tsx";
-import ApartmentDetailsPage from "./pages/ApartmentDetailsPage.tsx";
-import ApartmentUpdatePage from "./pages/ApartmentUpdatePage.tsx";
+import ApartmentsListPage from "./pages/ApartmentsListPage";
+import ApartmentCreatePage from "./pages/ApartmentCreatePage";
+import ApartmentDetailsPage from "./pages/ApartmentDetailsPage";
+import ApartmentUpdatePage from "./pages/ApartmentUpdatePage";
+
+import "./AppLayout.css";
 
 export default function App() {
   return (
-    <div>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div className="container">
-          <Link className="navbar-brand" to="/apartments">
-            Apartments
+    <div className="appShell">
+      <header className="appNav">
+        <div className="appContainer appNavInner">
+          <Link className="appBrand" to="/apartments" aria-label="Apartments home">
+            <span className="appBrandMark" />
+            <span className="appBrandText">DBEP REAL ESTATE</span>
           </Link>
 
-          <div className="ms-auto">
-            <Link className="btn btn-outline-light" to="/apartments/new">
+          <nav className="appNavLinks" aria-label="Primary">
+            <Link className="appNavLink" to="/apartments">
+              Portfolio
+            </Link>
+          </nav>
+
+          <div className="appNavActions">
+            <Link className="appBtn appBtnGhost" to="/apartments/new">
               New apartment
             </Link>
           </div>
         </div>
-      </nav>
+      </header>
 
-      <main className="container py-4">
+      <main className="appContainer appMain">
         <Routes>
           <Route path="/" element={<Navigate to="/apartments" replace />} />
 

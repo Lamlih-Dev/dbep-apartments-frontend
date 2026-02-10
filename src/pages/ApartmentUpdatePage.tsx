@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import "./ApartmentUpdatePage.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -31,6 +32,19 @@ export default function ApartmentUpdatePage() {
   const [pricePerNight, setPricePerNight] = useState<string>("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+
+  const imagePreview = useMemo(() => {
+    const url = imageUrl.trim();
+    if (!url) return null;
+    return url;
+  }, [imageUrl]);
+
+  function toNumberOrNull(v: string) {
+    const s = v.trim();
+    if (!s) return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -88,16 +102,23 @@ export default function ApartmentUpdatePage() {
     if (!id) return;
 
     setSaving(true);
+    setError(null);
 
     const payload = {
-      title,
-      address: address || null,
-      surface: surface ? Number(surface) : null,
-      rooms: rooms ? Number(rooms) : null,
-      pricePerNight: pricePerNight ? Number(pricePerNight) : null,
-      description: description || null,
-      imageUrl: imageUrl || null,
+      title: title.trim(),
+      address: address.trim() || null,
+      surface: toNumberOrNull(surface),
+      rooms: toNumberOrNull(rooms),
+      pricePerNight: toNumberOrNull(pricePerNight),
+      description: description.trim() || null,
+      imageUrl: imageUrl.trim() || null,
     };
+
+    if (!payload.title) {
+      setSaving(false);
+      setError("Title is required.");
+      return;
+    }
 
     const res = await fetch(`${API_BASE_URL}/api/apartments/${id}`, {
       method: "PUT",
@@ -108,7 +129,7 @@ export default function ApartmentUpdatePage() {
     setSaving(false);
 
     if (!res.ok) {
-      alert("Update failed");
+      setError("Update failed. Please check your inputs and try again.");
       return;
     }
 
@@ -117,94 +138,192 @@ export default function ApartmentUpdatePage() {
 
   if (!id) return <div>Missing id</div>;
 
-  if (loading) return <div className="text-muted">Loading…</div>;
+  if (loading) return <div className="apU-muted">Loading…</div>;
 
-  if (error) return <div className="alert alert-danger">{error}</div>;
+  if (error && !saving && notFound === false && loading === false) {
+    // keep rendering the page too, but show alert
+  }
 
-  if (notFound) return <div className="alert alert-danger">Apartment not found</div>;
+  if (notFound) return <div className="apU-alert apU-alertDanger">Apartment not found</div>;
 
   return (
-    <div>
-      <div className="page-title">
-        <h2 className="m-0">Update apartment</h2>
-        <Link to={`/apartments/${id}`} className="btn btn-outline-secondary">
-          Back
-        </Link>
+    <div className="apU">
+      <div className="apU-top">
+        <div>
+          <div className="apU-kicker">Portfolio</div>
+          <h1 className="apU-title">Update apartment</h1>
+          <p className="apU-subtitle">Refine details and keep your listing premium.</p>
+        </div>
+
+        <div className="apU-actions">
+          <Link to={`/apartments/${id}`} className="apU-btn apU-btnGhost">
+            Back
+          </Link>
+          <button
+            className="apU-btn apU-btnPrimary"
+            type="submit"
+            form="updateApartmentForm"
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Save"}
+          </button>
+        </div>
       </div>
 
-      <form className="card p-3" onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Title *</label>
-          <input
-            className="form-control"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Address</label>
-          <input
-            className="form-control"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-        </div>
-
-        <div className="row g-3 mb-3">
-          <div className="col-md-4">
-            <label className="form-label">Surface (m²)</label>
-            <input
-              className="form-control"
-              value={surface}
-              onChange={(e) => setSurface(e.target.value)}
-            />
-          </div>
-
-          <div className="col-md-4">
-            <label className="form-label">Rooms</label>
-            <input
-              className="form-control"
-              value={rooms}
-              onChange={(e) => setRooms(e.target.value)}
-            />
-          </div>
-
-          <div className="col-md-4">
-            <label className="form-label">Price / night</label>
-            <input
-              className="form-control"
-              value={pricePerNight}
-              onChange={(e) => setPricePerNight(e.target.value)}
-            />
+      {error && (
+        <div className="apU-alert">
+          <div>
+            <div className="apU-alertTitle">Couldn’t update apartment</div>
+            <div className="apU-alertText">{error}</div>
           </div>
         </div>
+      )}
 
-        <div className="mb-3">
-          <label className="form-label">Description</label>
-          <textarea
-            className="form-control"
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
+      <div className="apU-grid">
+        {/* Form */}
+        <form id="updateApartmentForm" className="apU-card" onSubmit={handleSubmit}>
+          <div className="apU-cardHeader">
+            <div>
+              <div className="apU-cardKicker">Details</div>
+              <h2 className="apU-cardTitle">Apartment information</h2>
+            </div>
+          </div>
 
-        <div className="mb-3">
-          <label className="form-label">Image URL (temporary)</label>
-          <input
-            className="form-control"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="https://..."
-          />
-        </div>
+          <div className="apU-cardBody">
+            <div className="apU-row">
+              <div className="apU-field apU-fieldFull">
+                <label className="apU-label">
+                  Title <span className="apU-required">*</span>
+                </label>
+                <input
+                  className="apU-input"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Veloura Residences"
+                  required
+                />
+                <div className="apU-help">A clear name for designers and clients.</div>
+              </div>
 
-        <button className="btn btn-primary" type="submit" disabled={saving}>
-          {saving ? "Saving..." : "Save"}
-        </button>
-      </form>
+              <div className="apU-field apU-fieldFull">
+                <label className="apU-label">Address</label>
+                <input
+                  className="apU-input"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="e.g. Casablanca, Morocco"
+                />
+              </div>
+
+              <div className="apU-field">
+                <label className="apU-label">Surface (m²)</label>
+                <input
+                  className="apU-input"
+                  value={surface}
+                  onChange={(e) => setSurface(e.target.value)}
+                  placeholder="e.g. 92"
+                  inputMode="decimal"
+                />
+              </div>
+
+              <div className="apU-field">
+                <label className="apU-label">Rooms</label>
+                <input
+                  className="apU-input"
+                  value={rooms}
+                  onChange={(e) => setRooms(e.target.value)}
+                  placeholder="e.g. 3"
+                  inputMode="numeric"
+                />
+              </div>
+
+              <div className="apU-field">
+                <label className="apU-label">Price / night</label>
+                <input
+                  className="apU-input"
+                  value={pricePerNight}
+                  onChange={(e) => setPricePerNight(e.target.value)}
+                  placeholder="e.g. 300"
+                  inputMode="decimal"
+                />
+              </div>
+
+              <div className="apU-field apU-fieldFull">
+                <label className="apU-label">Description</label>
+                <textarea
+                  className="apU-textarea"
+                  rows={5}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Write a short designer-friendly description…"
+                />
+              </div>
+
+              <div className="apU-field apU-fieldFull">
+                <label className="apU-label">Image URL</label>
+                <input
+                  className="apU-input"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+                <div className="apU-help">Temporary: paste an image URL. Later we can add upload.</div>
+              </div>
+            </div>
+
+            <div className="apU-footerRow">
+              <Link to={`/apartments/${id}`} className="apU-btn apU-btnGhost">
+                Cancel
+              </Link>
+
+              <button className="apU-btn apU-btnPrimary" type="submit" disabled={saving}>
+                {saving ? "Saving…" : "Save changes"}
+              </button>
+            </div>
+          </div>
+        </form>
+
+        {/* Preview */}
+        <aside className="apU-card apU-sticky">
+          <div className="apU-cardHeader">
+            <div>
+              <div className="apU-cardKicker">Preview</div>
+              <h2 className="apU-cardTitle">Cover image</h2>
+            </div>
+          </div>
+
+          <div className="apU-cardBody">
+            <div className="apU-preview">
+              {imagePreview ? (
+                <img
+                  className="apU-previewImg"
+                  src={imagePreview}
+                  alt="Preview"
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="apU-previewEmpty">
+                  <div className="apU-previewEmptyTitle">No image yet</div>
+                  <div className="apU-previewEmptyText">
+                    Add an image URL to preview the cover.
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="apU-mini">
+              <div className="apU-miniKicker">Tip</div>
+              <div className="apU-miniText">
+                Use a wide photo (landscape) to match the premium layout.
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
