@@ -267,7 +267,7 @@ export default function ApartmentUpdatePage() {
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://..."
                 />
-                <div className="apU-help">Temporary: paste an image URL. Later we can add upload.</div>
+                <div className="apU-help">Paste an image URL.</div>
               </div>
             </div>
 

@@ -195,7 +195,7 @@ export default function ApartmentCreatePage() {
                   placeholder="https://..."
                 />
                 <div className="apC-help">
-                  Temporary: paste an image URL. Later we can add upload.
+                  Paste an image URL.
                 </div>
               </div>
             </div>
