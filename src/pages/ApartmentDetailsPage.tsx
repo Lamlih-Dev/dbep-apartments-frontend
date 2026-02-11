@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import "./ApartmentDetailsPage.css";
+import AdminActionsCard from "../components/AdminActionsCard";
+import { isAdmin } from "../auth";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -24,7 +26,7 @@ type Review = {
   id: string;
   name: string;
   role: string;
-  rating: number; // 1..5
+  rating: number;
   date: string;
   text: string;
 };
@@ -49,7 +51,7 @@ function clampRating(n: number) {
 function Stars({ rating }: { rating: number }) {
   const r = clampRating(rating);
   return (
-    <div className="aptD-stars" aria-label={`${r} out of 5`}>
+    <div className="aptD-stars" aria-label={`${r} sur 5`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <span key={i} className={i < r ? "aptD-star aptD-starOn" : "aptD-star"}>
           ★
@@ -81,32 +83,31 @@ export default function ApartmentDetailsPage() {
   const qrCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Demo reviews (replace later with API)
   const demoReviews: Review[] = useMemo(
     () => [
       {
         id: "r1",
         name: "Salma Bennani",
-        role: "Interior Designer",
+        role: "Designer d’intérieur",
         rating: 5,
         date: "2026-01-14",
-        text: "Beautifully balanced layout. The lighting and materials feel premium, and the flow is perfect for client walkthroughs.",
+        text: "Une composition parfaitement équilibrée. La lumière et les matériaux sont premium, et le parcours est idéal pour les visites clients.",
       },
       {
         id: "r2",
         name: "Youssef El Amrani",
-        role: "Architect",
+        role: "Architecte",
         rating: 4,
         date: "2026-01-08",
-        text: "Clean geometry and strong proportions. I'd add a bit more storage detail, but overall it’s a very solid design.",
+        text: "Géométrie propre et proportions solides. J’ajouterais un peu plus de détails sur les rangements, mais l’ensemble est très réussi.",
       },
       {
         id: "r3",
         name: "Nora Lahlou",
-        role: "Property Stylist",
+        role: "Home stager",
         rating: 5,
         date: "2025-12-22",
-        text: "Perfect for showcasing. Great hero image, and the QR share is super convenient for clients on-site.",
+        text: "Parfait pour mettre en valeur le bien. Très belle image principale, et le partage par QR est super pratique sur site.",
       },
     ],
     []
@@ -114,14 +115,12 @@ export default function ApartmentDetailsPage() {
 
   const shareUrl = useMemo(() => (id ? `${DETAILS_BASE_URL}${id}` : ""), [id]);
 
-  // Map embed (no API key): uses address if available, else falls back to city
   const mapQuery = useMemo(() => {
-    const q = apt?.address?.trim() || "Casablanca, Morocco";
+    const q = apt?.address?.trim() || "Casablanca, Maroc";
     return encodeURIComponent(q);
   }, [apt?.address]);
 
   const mapEmbedUrl = useMemo(() => {
-    // Works without an API key in most cases; great for demo/prototypes.
     return `https://www.google.com/maps?q=${mapQuery}&output=embed`;
   }, [mapQuery]);
 
@@ -147,7 +146,7 @@ export default function ApartmentDetailsPage() {
 
         if (!res.ok) {
           setApt(null);
-          setError(`Request failed (HTTP ${res.status})`);
+          setError(`Échec de la requête (HTTP ${res.status})`);
           return;
         }
 
@@ -156,7 +155,7 @@ export default function ApartmentDetailsPage() {
       } catch (e: any) {
         if (!cancelled) {
           setApt(null);
-          setError(e?.message ?? "Network error");
+          setError(e?.message ?? "Erreur réseau");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -173,7 +172,7 @@ export default function ApartmentDetailsPage() {
     if (!canvas || !apt) return;
 
     const a = document.createElement("a");
-    a.download = `${apt.title?.trim()?.replace(/\s+/g, "-").toLowerCase() || "apartment"}-qr.png`;
+    a.download = `${apt.title?.trim()?.replace(/\s+/g, "-").toLowerCase() || "appartement"}-qr.png`;
     a.href = canvas.toDataURL("image/png");
     a.click();
   }
@@ -195,38 +194,33 @@ export default function ApartmentDetailsPage() {
     }
   }
 
-  if (!id) return <div>Missing id</div>;
-  if (loading) return <div className="text-muted">Loading…</div>;
+  if (!id) return <div>ID manquant</div>;
+  if (loading) return <div className="text-muted">Chargement…</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
-  if (notFound) return <div className="alert alert-danger">Apartment not found</div>;
-  if (!apt) return <div className="alert alert-danger">Something went wrong</div>;
+  if (notFound) return <div className="alert alert-danger">Appartement introuvable</div>;
+  if (!apt) return <div className="alert alert-danger">Une erreur est survenue</div>;
 
   const rating = avgRating(demoReviews);
   const ratingRounded = Math.round(rating * 10) / 10;
 
   return (
     <div className="aptD">
-      {/* Top bar */}
       <div className="aptD-top">
         <div className="aptD-breadcrumb">
           <Link to="/apartments" className="aptD-linkMuted">
-            Apartments
+            Appartements
           </Link>
           <span className="aptD-dot">•</span>
-          <span className="aptD-current">Details</span>
+          <span className="aptD-current">Détails</span>
         </div>
 
         <div className="aptD-actions">
-          <Link to={`/apartments/${id}/edit`} className="aptD-btn aptD-btnGhost">
-            Update
-          </Link>
           <Link to="/apartments" className="aptD-btn aptD-btnPrimary">
-            Back to list
+            Retour à la liste
           </Link>
         </div>
       </div>
 
-      {/* Hero */}
       <section className="aptD-hero">
         <div className="aptD-heroMedia">
           {apt.imageUrl ? (
@@ -234,22 +228,22 @@ export default function ApartmentDetailsPage() {
           ) : (
             <div className="aptD-heroPlaceholder">
               <div className="aptD-heroPlaceholderInner">
-                <div className="aptD-heroPlaceholderTitle">No image</div>
-                <div className="aptD-heroPlaceholderSub">Add one to elevate the listing.</div>
+                <div className="aptD-heroPlaceholderTitle">Aucune image</div>
+                <div className="aptD-heroPlaceholderSub">Ajoutez-en une pour valoriser l’annonce.</div>
               </div>
             </div>
           )}
         </div>
 
         <div className="aptD-heroPanel">
-          <div className="aptD-kicker">Apartment</div>
+          <div className="aptD-kicker">Appartement</div>
 
           <h1 className="aptD-title">{apt.title}</h1>
 
           {apt.address ? (
             <div className="aptD-address">{apt.address}</div>
           ) : (
-            <div className="aptD-address aptD-muted">No address provided</div>
+            <div className="aptD-address aptD-muted">Aucune adresse renseignée</div>
           )}
 
           <div className="aptD-metaRow">
@@ -259,35 +253,34 @@ export default function ApartmentDetailsPage() {
             </div>
 
             <div className="aptD-chip">
-              <span className="aptD-chipLabel">Rooms</span>
+              <span className="aptD-chipLabel">Pièces</span>
               <span className="aptD-chipValue">{apt.rooms ?? "—"}</span>
             </div>
 
             <div className="aptD-chip">
-              <span className="aptD-chipLabel">Rating</span>
+              <span className="aptD-chipLabel">Note</span>
               <span className="aptD-chipValue">{ratingRounded || "—"}/5</span>
             </div>
           </div>
 
           <div className="aptD-priceCard">
             <div>
-              <div className="aptD-priceLabel">Price / night</div>
+              <div className="aptD-priceLabel">Prix / nuit</div>
               <div className="aptD-priceValue">{formatMoney(apt.pricePerNight)}</div>
             </div>
 
             <div className="aptD-priceBadge">Premium</div>
           </div>
 
-          {/* Optional: keep UUID subtle */}
           <details className="aptD-details">
-            <summary className="aptD-detailsSummary">Technical details</summary>
+            <summary className="aptD-detailsSummary">Détails techniques</summary>
             <div className="aptD-detailsBody">
               <div className="aptD-row">
                 <span className="aptD-rowKey">UUID</span>
                 <span className="aptD-rowVal">{apt.id}</span>
               </div>
               <div className="aptD-row">
-                <span className="aptD-rowKey">Share URL</span>
+                <span className="aptD-rowKey">Lien de partage</span>
                 <span className="aptD-rowVal">{shareUrl}</span>
               </div>
             </div>
@@ -295,15 +288,12 @@ export default function ApartmentDetailsPage() {
         </div>
       </section>
 
-      {/* Content grid */}
       <section className="aptD-grid">
-        {/* Left column */}
         <div className="aptD-leftCol">
-          {/* Description */}
           <article className="aptD-card">
             <div className="aptD-cardHeader">
               <div>
-                <div className="aptD-cardKicker">Overview</div>
+                <div className="aptD-cardKicker">Aperçu</div>
                 <h2 className="aptD-cardTitle">Description</h2>
               </div>
             </div>
@@ -312,20 +302,19 @@ export default function ApartmentDetailsPage() {
               {apt.description ? (
                 <p className="aptD-paragraph">{apt.description}</p>
               ) : (
-                <div className="aptD-muted">No description yet.</div>
+                <div className="aptD-muted">Aucune description pour le moment.</div>
               )}
             </div>
           </article>
 
-          {/* Reviews (avis) */}
           <article className="aptD-card">
             <div className="aptD-cardHeader aptD-cardHeaderRow">
               <div>
                 <div className="aptD-cardKicker">Avis</div>
-                <h2 className="aptD-cardTitle">Reviews</h2>
+                <h2 className="aptD-cardTitle">Avis</h2>
               </div>
 
-              <div className="aptD-ratingPill" title="Demo rating">
+              <div className="aptD-ratingPill" title="Note de démonstration">
                 <Stars rating={ratingRounded || 5} />
                 <span className="aptD-ratingText">{ratingRounded || "5.0"}</span>
                 <span className="aptD-ratingCount">({demoReviews.length})</span>
@@ -362,19 +351,18 @@ export default function ApartmentDetailsPage() {
             </div>
           </article>
 
-          {/* Map */}
           <article className="aptD-card">
             <div className="aptD-cardHeader">
               <div>
-                <div className="aptD-cardKicker">Location</div>
-                <h2 className="aptD-cardTitle">Map</h2>
+                <div className="aptD-cardKicker">Emplacement</div>
+                <h2 className="aptD-cardTitle">Carte</h2>
               </div>
             </div>
 
             <div className="aptD-cardBody">
               <div className="aptD-mapWrap">
                 <iframe
-                  title="Apartment location map"
+                  title="Carte de localisation de l’appartement"
                   src={mapEmbedUrl}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -383,7 +371,7 @@ export default function ApartmentDetailsPage() {
 
               <div className="aptD-mapFooter">
                 <div className="aptD-muted">
-                  {apt.address ? apt.address : "No address — showing demo location."}
+                  {apt.address ? apt.address : "Aucune adresse — affichage d’un emplacement de démonstration."}
                 </div>
 
                 <a
@@ -392,45 +380,46 @@ export default function ApartmentDetailsPage() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Open in Maps
+                  Ouvrir dans Maps
                 </a>
               </div>
             </div>
           </article>
         </div>
 
-        {/* Right column: share/QR */}
-        <aside className="aptD-card aptD-cardSticky">
-          <div className="aptD-cardHeader">
-            <div>
-              <div className="aptD-cardKicker">Share</div>
-              <h2 className="aptD-cardTitle">QR Code</h2>
+        <aside className="aptD-rightCol">
+          <div className="aptD-rightStack">
+            <div className="aptD-card">
+              <div className="aptD-cardHeader">
+                <div>
+                  <div className="aptD-cardKicker">Partager</div>
+                  <h2 className="aptD-cardTitle">Code QR</h2>
+                </div>
+              </div>
+
+              <div className="aptD-cardBody">
+                <div className="aptD-qrBox">
+                  <QRCodeCanvas ref={qrCanvasRef} value={shareUrl} size={220} includeMargin level="M" />
+                </div>
+
+                <div className="aptD-shareActions">
+                  <button className="aptD-btn aptD-btnPrimary aptD-btnWide" onClick={downloadQr}>
+                    Télécharger le QR
+                  </button>
+
+                  <button className="aptD-btn aptD-btnGhost aptD-btnWide" onClick={copyLink}>
+                    {copied ? "Copié ✓" : "Copier le lien"}
+                  </button>
+                </div>
+
+                <div className="aptD-footnote">
+                  Partagezvia QR ou lien. Idéal pour les visites et présentations.
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="aptD-cardBody">
-            <div className="aptD-qrBox">
-              <QRCodeCanvas
-                ref={qrCanvasRef}
-                value={shareUrl}
-                size={220}
-                includeMargin
-                level="M"
-              />
-            </div>
-
-            <div className="aptD-shareActions">
-              <button className="aptD-btn aptD-btnPrimary aptD-btnWide" onClick={downloadQr}>
-                Download QR
-              </button>
-
-              <button className="aptD-btn aptD-btnGhost aptD-btnWide" onClick={copyLink}>
-                {copied ? "Copied ✓" : "Copy link"}
-              </button>
-            </div>
-
-            <div className="aptD-footnote">
-              Share with clients by QR or link. Great for visits & presentations.
+            <div className="aptD-card mt-1">
+              <AdminActionsCard apartmentId={id} />
             </div>
           </div>
         </aside>

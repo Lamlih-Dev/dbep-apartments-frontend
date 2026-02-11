@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { isLoggedIn } from "../auth";
 import "./ApartmentUpdatePage.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
@@ -24,7 +25,6 @@ export default function ApartmentUpdatePage() {
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // form fields
   const [title, setTitle] = useState("");
   const [address, setAddress] = useState("");
   const [surface, setSurface] = useState<string>("");
@@ -32,6 +32,8 @@ export default function ApartmentUpdatePage() {
   const [pricePerNight, setPricePerNight] = useState<string>("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+
+  const canEdit = isLoggedIn();
 
   const imagePreview = useMemo(() => {
     const url = imageUrl.trim();
@@ -58,7 +60,6 @@ export default function ApartmentUpdatePage() {
         setError(null);
 
         const res = await fetch(`${API_BASE_URL}/api/apartments/${id}`);
-
         if (cancelled) return;
 
         if (res.status === 404) {
@@ -67,13 +68,12 @@ export default function ApartmentUpdatePage() {
         }
 
         if (!res.ok) {
-          setError(`Request failed (HTTP ${res.status})`);
+          setError(`Requête échouée (HTTP ${res.status})`);
           return;
         }
 
         const apt = (await res.json()) as Apartment;
 
-        // Prefill form
         setTitle(apt.title ?? "");
         setAddress(apt.address ?? "");
         setSurface(apt.surface !== null && apt.surface !== undefined ? String(apt.surface) : "");
@@ -86,7 +86,7 @@ export default function ApartmentUpdatePage() {
         setDescription(apt.description ?? "");
         setImageUrl(apt.imageUrl ?? "");
       } catch (e: any) {
-        if (!cancelled) setError(e?.message ?? "Network error");
+        if (!cancelled) setError(e?.message ?? "Erreur réseau");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -116,7 +116,7 @@ export default function ApartmentUpdatePage() {
 
     if (!payload.title) {
       setSaving(false);
-      setError("Title is required.");
+      setError("Le titre est obligatoire.");
       return;
     }
 
@@ -129,35 +129,44 @@ export default function ApartmentUpdatePage() {
     setSaving(false);
 
     if (!res.ok) {
-      setError("Update failed. Please check your inputs and try again.");
+      setError("La mise à jour a échoué. Vérifiez vos informations et réessayez.");
       return;
     }
 
     navigate(`/apartments/${id}`);
   }
 
-  if (!id) return <div>Missing id</div>;
+  if (!id) return <div>ID manquant</div>;
 
-  if (loading) return <div className="apU-muted">Loading…</div>;
-
-  if (error && !saving && notFound === false && loading === false) {
-    // keep rendering the page too, but show alert
+  if (!canEdit) {
+    return (
+      <div className="apU">
+        <div className="apU-alert apU-alertDanger">
+          Vous devez être connecté pour modifier cet appartement.
+        </div>
+        <Link to="/login" className="apU-btn apU-btnPrimary">
+          Se connecter
+        </Link>
+      </div>
+    );
   }
 
-  if (notFound) return <div className="apU-alert apU-alertDanger">Apartment not found</div>;
+  if (loading) return <div className="apU-muted">Chargement…</div>;
+
+  if (notFound) return <div className="apU-alert apU-alertDanger">Appartement introuvable</div>;
 
   return (
     <div className="apU">
       <div className="apU-top">
         <div>
           <div className="apU-kicker">Portfolio</div>
-          <h1 className="apU-title">Update apartment</h1>
-          <p className="apU-subtitle">Refine details and keep your listing premium.</p>
+          <h1 className="apU-title">Mettre à jour l'appartement</h1>
+          <p className="apU-subtitle">Affinez les détails et gardez une annonce premium.</p>
         </div>
 
         <div className="apU-actions">
           <Link to={`/apartments/${id}`} className="apU-btn apU-btnGhost">
-            Back
+            Retour
           </Link>
           <button
             className="apU-btn apU-btnPrimary"
@@ -165,7 +174,7 @@ export default function ApartmentUpdatePage() {
             form="updateApartmentForm"
             disabled={saving}
           >
-            {saving ? "Saving…" : "Save"}
+            {saving ? "Enregistrement…" : "Enregistrer"}
           </button>
         </div>
       </div>
@@ -173,19 +182,18 @@ export default function ApartmentUpdatePage() {
       {error && (
         <div className="apU-alert">
           <div>
-            <div className="apU-alertTitle">Couldn’t update apartment</div>
+            <div className="apU-alertTitle">Impossible de mettre à jour l'appartement</div>
             <div className="apU-alertText">{error}</div>
           </div>
         </div>
       )}
 
       <div className="apU-grid">
-        {/* Form */}
         <form id="updateApartmentForm" className="apU-card" onSubmit={handleSubmit}>
           <div className="apU-cardHeader">
             <div>
-              <div className="apU-cardKicker">Details</div>
-              <h2 className="apU-cardTitle">Apartment information</h2>
+              <div className="apU-cardKicker">Détails</div>
+              <h2 className="apU-cardTitle">Informations sur l'appartement</h2>
             </div>
           </div>
 
@@ -193,25 +201,25 @@ export default function ApartmentUpdatePage() {
             <div className="apU-row">
               <div className="apU-field apU-fieldFull">
                 <label className="apU-label">
-                  Title <span className="apU-required">*</span>
+                  Titre <span className="apU-required">*</span>
                 </label>
                 <input
                   className="apU-input"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Veloura Residences"
+                  placeholder="ex : Veloura Residences"
                   required
                 />
-                <div className="apU-help">A clear name for designers and clients.</div>
+                <div className="apU-help">Un nom clair pour les designers et les clients.</div>
               </div>
 
               <div className="apU-field apU-fieldFull">
-                <label className="apU-label">Address</label>
+                <label className="apU-label">Adresse</label>
                 <input
                   className="apU-input"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="e.g. Casablanca, Morocco"
+                  placeholder="ex : Casablanca, Maroc"
                 />
               </div>
 
@@ -221,29 +229,29 @@ export default function ApartmentUpdatePage() {
                   className="apU-input"
                   value={surface}
                   onChange={(e) => setSurface(e.target.value)}
-                  placeholder="e.g. 92"
+                  placeholder="ex : 92"
                   inputMode="decimal"
                 />
               </div>
 
               <div className="apU-field">
-                <label className="apU-label">Rooms</label>
+                <label className="apU-label">Pièces</label>
                 <input
                   className="apU-input"
                   value={rooms}
                   onChange={(e) => setRooms(e.target.value)}
-                  placeholder="e.g. 3"
+                  placeholder="ex : 3"
                   inputMode="numeric"
                 />
               </div>
 
               <div className="apU-field">
-                <label className="apU-label">Price / night</label>
+                <label className="apU-label">Prix / nuit</label>
                 <input
                   className="apU-input"
                   value={pricePerNight}
                   onChange={(e) => setPricePerNight(e.target.value)}
-                  placeholder="e.g. 300"
+                  placeholder="ex : 300"
                   inputMode="decimal"
                 />
               </div>
@@ -255,40 +263,39 @@ export default function ApartmentUpdatePage() {
                   rows={5}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Write a short designer-friendly description…"
+                  placeholder="Rédigez une courte description…"
                 />
               </div>
 
               <div className="apU-field apU-fieldFull">
-                <label className="apU-label">Image URL</label>
+                <label className="apU-label">URL de l'image</label>
                 <input
                   className="apU-input"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://..."
                 />
-                <div className="apU-help">Paste an image URL.</div>
+                <div className="apU-help">Collez une URL d'image.</div>
               </div>
             </div>
 
             <div className="apU-footerRow">
               <Link to={`/apartments/${id}`} className="apU-btn apU-btnGhost">
-                Cancel
+                Annuler
               </Link>
 
               <button className="apU-btn apU-btnPrimary" type="submit" disabled={saving}>
-                {saving ? "Saving…" : "Save changes"}
+                {saving ? "Enregistrement…" : "Enregistrer les modifications"}
               </button>
             </div>
           </div>
         </form>
 
-        {/* Preview */}
         <aside className="apU-card apU-sticky">
           <div className="apU-cardHeader">
             <div>
-              <div className="apU-cardKicker">Preview</div>
-              <h2 className="apU-cardTitle">Cover image</h2>
+              <div className="apU-cardKicker">Aperçu</div>
+              <h2 className="apU-cardTitle">Image de couverture</h2>
             </div>
           </div>
 
@@ -298,7 +305,7 @@ export default function ApartmentUpdatePage() {
                 <img
                   className="apU-previewImg"
                   src={imagePreview}
-                  alt="Preview"
+                  alt="Aperçu"
                   loading="lazy"
                   decoding="async"
                   onError={(e) => {
@@ -307,18 +314,18 @@ export default function ApartmentUpdatePage() {
                 />
               ) : (
                 <div className="apU-previewEmpty">
-                  <div className="apU-previewEmptyTitle">No image yet</div>
+                  <div className="apU-previewEmptyTitle">Pas d'image pour l'instant</div>
                   <div className="apU-previewEmptyText">
-                    Add an image URL to preview the cover.
+                    Ajoutez une URL d'image pour prévisualiser la couverture.
                   </div>
                 </div>
               )}
             </div>
 
             <div className="apU-mini">
-              <div className="apU-miniKicker">Tip</div>
+              <div className="apU-miniKicker">Astuce</div>
               <div className="apU-miniText">
-                Use a wide photo (landscape) to match the premium layout.
+                Utilisez une photo en mode paysage pour correspondre à la mise en page premium.
               </div>
             </div>
           </div>

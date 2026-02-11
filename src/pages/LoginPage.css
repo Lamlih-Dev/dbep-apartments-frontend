@@ -1,0 +1,107 @@
+.lg {
+  min-height: calc(100vh - 80px);
+  display: grid;
+  place-items: center;
+  padding: 28px 0;
+}
+
+.lg-card {
+  width: min(520px, 92vw);
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  padding: 22px;
+}
+
+.lg-kicker {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(15, 23, 42, 0.6);
+}
+
+.lg-title {
+  margin: 6px 0 0;
+  font-size: 28px;
+  line-height: 1.15;
+  color: #0f172a;
+}
+
+.lg-subtitle {
+  margin: 10px 0 0;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.lg-alert {
+  margin-top: 14px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.lg-alertTitle {
+  font-weight: 700;
+  color: #991b1b;
+}
+
+.lg-alertText {
+  margin-top: 4px;
+  color: rgba(153, 27, 27, 0.85);
+}
+
+.lg-form {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.lg-label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+  color: rgba(15, 23, 42, 0.9);
+}
+
+.lg-input {
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  padding: 0 12px;
+  outline: none;
+}
+
+.lg-input:focus {
+  border-color: rgba(15, 23, 42, 0.28);
+}
+
+.lg-btn {
+  height: 46px;
+  border-radius: 12px;
+  border: 0;
+  background: #0f172a;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lg-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.lg-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.lg-link {
+  color: rgba(15, 23, 42, 0.75);
+  text-decoration: none;
+}
+
+.lg-link:hover {
+  text-decoration: underline;
+}

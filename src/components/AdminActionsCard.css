@@ -1,0 +1,104 @@
+.admCard {
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.admTop {
+  padding: 16px 16px 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.admKicker {
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  opacity: .6;
+}
+
+.admTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.admSub {
+  font-size: 13px;
+  opacity: .75;
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+.admBadge {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+  font-weight: 600;
+  opacity: .8;
+}
+
+.admBody {
+  padding: 14px 16px 16px;
+}
+
+.admActions {
+  display: grid;
+  gap: 10px;
+}
+
+.admLocked {
+  display: grid;
+  gap: 10px;
+}
+
+.admLockedText {
+  font-size: 13px;
+  opacity: .75;
+}
+
+.admHint {
+  font-size: 12px;
+  opacity: .65;
+  margin-top: 4px;
+}
+
+.admBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid rgba(0,0,0,0.10);
+}
+
+.admBtnPrimary {
+  background: #111827;
+  color: #fff;
+  border-color: transparent;
+}
+
+.admBtnGhost {
+  background: transparent;
+  color: #111827;
+}
+
+.admBtnDanger {
+  background: #ffffff;
+  color: #b91c1c;
+  border: 1px solid rgba(185, 28, 28, 0.25);
+}
+
+.admBtnDanger:hover {
+  background: rgba(185, 28, 28, 0.06);
+  border-color: rgba(185, 28, 28, 0.4);
+}

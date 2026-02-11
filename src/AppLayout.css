@@ -170,3 +170,13 @@ body {
 ::selection {
   background: rgba(17, 24, 39, 0.10);
 }
+
+.appBtnPrimary {
+  background: #0f172a;
+  color: #fff;
+  border: none;
+}
+
+.appBtnPrimary:hover {
+  opacity: 0.9;
+}
