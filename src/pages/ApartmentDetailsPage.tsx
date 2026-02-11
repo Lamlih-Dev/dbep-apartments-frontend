@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import "./ApartmentDetailsPage.css";
 import AdminActionsCard from "../components/AdminActionsCard";
-import { isAdmin } from "../auth";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
